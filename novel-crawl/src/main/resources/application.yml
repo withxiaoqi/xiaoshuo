@@ -1,13 +1,13 @@
 #端口号
 server:
-  port: 8081
+  port: 18081
   servlet:
     session:
       timeout: 1D
 
 spring:
   profiles:
-    active: dev
+    active: prod
 
 #登录用户名密码
 admin:

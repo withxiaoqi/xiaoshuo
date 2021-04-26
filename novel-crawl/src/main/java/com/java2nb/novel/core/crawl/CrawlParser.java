@@ -65,7 +65,7 @@ public class CrawlParser {
                         boolean isFindPicUrl = picUrlMatch.find();
                         System.out.println("封面地址："+isFindPicUrl);
                         if (isFindPicUrl) {
-                            String picUrl = picUrlMatch.group(2);
+                            String picUrl = picUrlMatch.group(1);
                             if (StringUtils.isNotBlank(picUrl) && StringUtils.isNotBlank(ruleBean.getPicUrlPrefix())) {
                                 picUrl = ruleBean.getPicUrlPrefix() + picUrl;
                             }
@@ -158,6 +158,7 @@ public class CrawlParser {
         //读取目录
         String indexListUrl = ruleBean.getBookIndexUrl().replace("{bookId}", sourceBookId);
         String indexListHtml = getByHttpClientWithChrome(indexListUrl);
+        System.out.println("返回书籍目录："+indexListUrl);
 
         if (indexListHtml != null) {
             if (StringUtils.isNotBlank(ruleBean.getBookIndexStart())) {
@@ -187,6 +188,7 @@ public class CrawlParser {
                 }
                 BookIndex hasIndex = hasIndexs.get(indexNum);
                 String indexName = indexNameMatch.group(2);
+                System.out.println("章节名称："+indexName);
 //                if (indexNameList.contains(indexName)) {
 //                    continue;
 //                } else {
@@ -232,6 +234,8 @@ public class CrawlParser {
                     if (contentHtml != null && !contentHtml.contains("正在手打中")) {
                         String content = contentHtml.substring(contentHtml.indexOf(ruleBean.getContentStart()) + ruleBean.getContentStart().length());
                         content = content.substring(0, content.indexOf(ruleBean.getContentEnd()));
+                        System.out.println("章节内容："+content);
+
                         //插入章节目录和章节内容
                         BookIndex bookIndex = new BookIndex();
                         bookIndex.setIndexName(indexName);
@@ -350,187 +354,104 @@ public class CrawlParser {
         RuleBean ruleBean = new ObjectMapper().readValue(rule, RuleBean.class);
 
         String matcherStr = ruleBean.getBookNamePatten();
-        matcherStr="<a style=\"\" href=\"/\\d+_\\d+/(\\d+)\\.html\">([^/]+)</a>";
+        matcherStr="<img src=\\\"([^>]+)\\\" +onerror=";
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append("<!DOCTYPE html>\n" +
+        stringBuffer.append("\n" +
+                "<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head>\n" +
                 "    <meta charset=\"utf-8\">\n" +
-                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1\">\n" +
-                "    <title>从亡国公主到第一高手最新章节_从亡国公主到第一高手全文阅读_香已燃起_笔趣阁</title>\n" +
-                "    <meta name=\"keywords\" content=\"从亡国公主到第一高手,香已燃起,从亡国公主到第一高手最新章节\" />\n" +
-                "    <meta name=\"description\" content=\"从亡国公主到第一高手最新章节由网友提供，《从亡国公主到第一高手》情节跌宕起伏、扣人心弦，是一本情节与文笔俱佳的，笔趣阁免费提供从亡国公主到第一高手最新清爽干净的文字章节在线阅读。\" />\n" +
+                "    <title>仙子别跑啊最新章节_仙子别跑啊全文阅读_长街纵马_笔趣阁</title>\n" +
+                "    <meta name=\"keywords\" content=\"仙子别跑啊,长街纵马,仙子别跑啊最新章节\" />\n" +
+                "    <meta name=\"description\" content=\"仙子别跑啊最新章节由网友提供，《仙子别跑啊》情节跌宕起伏、扣人心弦，是一本情节与文笔俱佳的，笔趣阁免费提供仙子别跑啊最新清爽干净的文字章节在线阅读。\" />\n" +
+                "    <meta name=\"MobileOptimized\" content=\"240\" />\n" +
+                "    <meta name=\"applicable-device\" content=\"mobile\" />\n" +
+                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no\" />\n" +
+                "    <meta name=\"format-detection\" content=\"telephone=no\" />\n" +
+                "    <meta name=\"apple-mobile-web-app-capable\" content=\"yes\" />\n" +
+                "    <meta name=\"apple-mobile-web-app-status-bar-style\" content=\"black-translucent\" />\n" +
                 "    \n" +
                 "    <meta property=\"og:type\" content=\"novel\" />\n" +
-                "    <meta property=\"og:title\" content=\"从亡国公主到第一高手\" />\n" +
-                "    <meta property=\"og:description\" content=\"穿越到这个低武世界后，月如霜身为东夏长公主，一直要风得风，要雨得雨，日子滋润的不得了。<br/><br/>可惜十五岁那年，她的好日子到了头，她的孪生妹妹月如雪灌醉了她，代她嫁给了南梁镇北王萧棠。<br/><br/>她十六岁那年，月如雪因为与侍卫私会被抓，而被遣回东夏，南梁自此与东夏反目成仇。<br/><br/>她十八岁那年，东夏被北齐灭国，她成了亡国公主。月如霜醒悟了，她要权势，她要武功，只有这样，她才能保护自己所爱之人。\" />\n" +
-                "    <meta property=\"og:image\" content=\"/files/article/image/123/123195/123195s.jpg\" />\n" +
+                "    <meta property=\"og:title\" content=\"仙子别跑啊\" />\n" +
+                "    <meta property=\"og:description\" content=\"前方收费站，减速慢行，请交费！此路是我开，此树是我栽，要想过此路，留下买路财！<br/><br/>开局一座收费站，灵石法宝美女，统统给我留下来！我，万界秩序制定者，就这么横！\" />\n" +
+                "    <meta property=\"og:image\" content=\"/files/article/image/124/124141/124141s.jpg\" />\n" +
                 "    <meta property=\"og:novel:category\" content=\"玄幻奇幻\" />\n" +
-                "    <meta property=\"og:novel:author\" content=\"香已燃起\" />\n" +
-                "    <meta property=\"og:novel:book_name\" content=\"从亡国公主到第一高手\" />\n" +
-                "    <meta property=\"og:novel:read_url\" content=\"/123_123195/\" />\n" +
-                "    <meta property=\"og:novel:update_time\" content=\"2021-03-02 13:00:00\" />\n" +
-                "    <meta property=\"og:novel:latest_chapter_name\" content=\"第24章 旧伤\" />\n" +
-                "    <meta property=\"og:novel:latest_chapter_url\" content=\"/123_123195/48686574.html\" />\n" +
+                "    <meta property=\"og:novel:author\" content=\"长街纵马\" />\n" +
+                "    <meta property=\"og:novel:book_name\" content=\"仙子别跑啊\" />\n" +
+                "    <meta property=\"og:novel:read_url\" content=\"/124_124141/\" />\n" +
+                "    <meta property=\"og:novel:update_time\" content=\"2021-03-30 22:39:32\" />\n" +
+                "    <meta property=\"og:novel:latest_chapter_name\" content=\"第五十六章 愿做保洁的风家\" />\n" +
+                "    <meta property=\"og:novel:latest_chapter_url\" content=\"/124_124141/49157098.html\" />\n" +
+                "\n" +
+                "    <script language=\"javascript\" type=\"text/javascript\" src=\"/js/zepto.min.js\"></script>\n" +
+                "    <script language=\"javascript\" type=\"text/javascript\" src=\"/js/common.js\"></script>\n" +
+                "    <script language=\"javascript\" type=\"text/javascript\" src=\"/js/lazyload.js\"></script>\n" +
+                "    <script src=\"/js/mcmssc.js\"></script>\n" +
+                "  <script src=\"/4PuAZ5gG/hVXVms.js\"></script>\n" +
+                "  <script src=\"/4PuAZ5gG/comms.js\"></script>\n" +
+                "    \n" +
                 "\n" +
                 "    <link rel=\"stylesheet\" href=\"/layui/css/layui.css\" />\n" +
-                "    <link rel=\"stylesheet\" href=\"/static/css/xiaoshuo.css\" />\n" +
-                "    <script type=\"text/javascript\" src=\"/static/js/jq.min.js\"></script>\n" +
-                "    <script type=\"text/javascript\" src=\"/static/js/Post.js\"></script>\n" +
-                "    <script type=\"text/javascript\" src=\"/static/js/wap.js\"></script>\n" +
-                "    <script type=\"text/javascript\" src=\"/static/js/bqg.js\"></script>\n" +
-                "    <script type=\"text/javascript\" src=\"/static/js/index.js\"></script>\n" +
+                "    <link rel=\"stylesheet\" href=\"/css/reset.css\" />\n" +
                 "    \n" +
-                "    <script type=\"text/javascript\">\n" +
-                "    if(isMobileBrowser())\n" +
-                "    {\n" +
-                "        document.location.href='http://m.mcmssc.com/123_123195/';\n" +
-                "    }\n" +
-                "    </script>\n" +
+                "    <link rel=\"stylesheet\" href=\"/css/bookinfo.css\" />\n" +
                 "\n" +
                 "</head>\n" +
                 "<body>\n" +
-                "<div id=\"wrapper\">\n" +
-                "<div class=\"ywtop\">\n" +
-                "    <div class=\"ywtop_con\">\n" +
-                "        <div class=\"ywtop_sethome\">\n" +
-                "            <a onclick=\"this.style.behavior='url(#default#homepage)';this.setHomePage('http://www.mcmssc.com/');\" href=\"#\">将笔趣阁设为首页</a>\n" +
-                "        </div>\n" +
-                "        <div class=\"ywtop_addfavorite\">\n" +
-                "            <a href=\"javascript:window.external.addFavorite('http://www.mcmssc.com/','长乐歌最新章节_长乐歌全文阅读_三戒大师_笔趣阁')\">收藏笔趣阁</a>\n" +
-                "        </div>\n" +
-                "        <div class=\"nri\">\n" +
-                "                        <form name=\"mylogin\" id=\"mylogin\" method=\"post\" action=\"/index.php?s=/web/index/login\">\n" +
-                "                <div class=\"cc\">\n" +
-                "                    <div class=\"txt\">账号：</div>\n" +
-                "                    <div class=\"inp\"><input type=\"text\" name=\"uname\" id=\"uname\"></div>\n" +
-                "                </div>\n" +
-                "                <div class=\"cc\">\n" +
-                "                    <div class=\"txt\">密码：</div>\n" +
-                "                    <div class=\"inp\"><input type=\"password\" name=\"pass\" id=\"pass\"></div>\n" +
-                "                </div>\n" +
-                "                <div class=\"frii\">\n" +
-                "                    <input type=\"submit\" class=\"int\" value=\" \">\n" +
-                "                </div>\n" +
-                "                <div class=\"ccc\">\n" +
-                "                    <div class=\"txtt\"></div>\n" +
-                "                    <div class=\"txtt\"><a href=\"/index.php?s=/web/index/reg\">用户注册</a></div>\n" +
-                "                </div>\n" +
-                "            </form>\n" +
-                "                    </div>\n" +
-                "    </div>\n" +
-                "</div>\n" +
                 "\n" +
-                "<div class=\"header\">\n" +
-                "    <div class=\"header_logo\">\n" +
-                "        <a href=\"http://www.mcmssc.com/\">笔趣阁</a>\n" +
-                "    </div>\n" +
-                "    <div class=\"header_search\">\n" +
-                "        <form name=\"mysearch\" id=\"mysearch\" method=\"get\" action=\"/search.html\">\n" +
-                "            <input class=\"search\" id=\"bdcsMain\" name=\"name\" type=\"text\" maxlength=\"30\" value=\"可搜书名和作者，可少字但别输错字。\" onfocus=\"this.style.color = '#000000';this.focus();if(this.value=='可搜书名和作者，可少字但别输错字。'){this.value='';}\" ondblclick=\"javascript:this.value=''\">\n" +
-                "            <input type=\"submit\" class=\"searchBtn\" value=\"搜索\" title=\"搜索\">\n" +
-                "        </form>\n" +
-                "    </div>\n" +
-                "</div>\n" +
+                "<header class=\"channelHeader channelHeader2\">\n" +
+                "    <a href=\"javascript:history.go(-1);\" class=\"iconback\"><img src=\"/images/header-back.gif\" alt=\"返回\" /></a>\n" +
+                "    <span class=\"title\">仙子别跑啊</span>\n" +
+                "    <a href=\"/\" class=\"iconhome\"><img src=\"/images/header-backhome.gif\" alt=\"首页\" /></a>\n" +
+                "</header>\n" +
                 "\n" +
-                "<div class=\"clear\"></div>\n" +
-                "\n" +
-                "<div class=\"nav\">\n" +
-                "    <ul>\n" +
-                "        <li><a href=\"/\">首页</a></li>\n" +
-                "        <li><a rel=\"nofollow\" href=\"/bookcase.php\">我的书架</a></li>\n" +
-                "        <li><a href=\"/xuanhuanxiaoshuo/\">玄幻奇幻</a></li>\n" +
-                "        <li><a href=\"/xiuzhenxiaoshuo/\">修真仙侠</a></li>\n" +
-                "        <li><a href=\"/dushixiaoshuo/\">都市青春</a></li>\n" +
-                "        <li><a href=\"/chuanyuexiaoshuo/\">历史穿越</a></li>\n" +
-                "        <li><a href=\"/wangyouxiaoshuo/\">网游竞技</a></li>\n" +
-                "        <li><a href=\"/kehuanxiaoshuo/\">科幻灵异</a></li>\n" +
-                "        <li><a href=\"/qitaxiaoshuo/\">其它小说</a></li>\n" +
-                "        <li><a rel=\"nofollow\" href=\"/gj.html\">阅读轨迹</a></li>\n" +
-                "        <li><a href=\"/wanben/1_1\">完本小说</a></li>\n" +
-                "        <li><a href=\"/paihangbang/\">排行榜单</a></li>\n" +
-                "        <li><a href=\"/xiaoshuodaquan/\">小说大全</a></li>\n" +
-                "    </ul>\n" +
-                "</div>\n" +
-                "\n" +
-                "<div id=\"main\">\n" +
-                "\n" +
-                "<div class=\"box_con\">\n" +
-                "    <div class=\"con_top\">\n" +
-                "        <a href=\"/\">笔趣阁</a> &gt; 从亡国公主到第一高手最新章节列表\n" +
-                "    </div>\n" +
-                "    \n" +
-                "    <div id=\"maininfo\">\n" +
+                "<div class=\"synopsisArea\">\n" +
+                "     <div class=\"synopsisArea_detail\">\n" +
                 "        <div id=\"bookdetail\">\n" +
-                "            <div id=\"info\">\n" +
-                "                <h1>从亡国公主到第一高手</h1>\n" +
-                "                <p>作&nbsp;&nbsp;者：<a href=\"/author/123195/\">香已燃起</a></p>\n" +
-                "                <p>动&nbsp;&nbsp;作：<a href=\"javascript:;\" onclick=\"addBookCase(123195);\">加入书架</a>, <a rel=\"nofollow\" href=\"#footer\">直达底部</a></p>\n" +
-                "                <p>最后更新：2021-03-02 13:00:00</p>\n" +
-                "                <p>最新章节：<a href=\"/123_123195/48686574.html\">第24章 旧伤</a></p>\n" +
+                "            <div id=\"thumb\">\n" +
+                "                <img src=\"/files/article/image/124/124141/124141s.jpg\" onerror=\"this.src='/images/defaultimg.png';this.onerror=null;\" />\n" +
                 "            </div>\n" +
-                "            <div id=\"intro\">\n" +
-                "            &nbsp;&nbsp;&nbsp;&nbsp;穿越到这个低武世界后，月如霜身为东夏长公主，一直要风得风，要雨得雨，日子滋润的不得了。<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;可惜十五岁那年，她的好日子到了头，她的孪生妹妹月如雪灌醉了她，代她嫁给了南梁镇北王萧棠。<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;她十六岁那年，月如雪因为与侍卫私会被抓，而被遣回东夏，南梁自此与东夏反目成仇。<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;她十八岁那年，东夏被北齐灭国，她成了亡国公主。月如霜醒悟了，她要权势，她要武功，只有这样，她才能保护自己所爱之人。            </div>\n" +
-                "        </div>\n" +
-                "        <div id=\"bookscore\">\n" +
-                "            <div class=\"score\">\n" +
-                "                <div class=\"score_content\" id=\"score_content\">\n" +
-                "                    <div class=\"score_avg\">\n" +
-                "                        <span><em>9.5</em><i>9.5</i></span>\n" +
-                "                    </div>\n" +
-                "                    <div class=\"score_total\">共 <span>0</span> 人<br>参与评分</div>\n" +
-                "                    <ul class=\"score_list\">\n" +
-                "                        <li><span>超酷</span><i style=\"width:46px\"></i> <em>0人</em></li>\n" +
-                "                        <li><span>好看</span><i style=\"width:8px\"></i> <em>0人</em></li>\n" +
-                "                        <li><span>一般</span><i style=\"width:4px\"></i> <em>0人</em></li>\n" +
-                "                        <li><span>无聊</span><i style=\"width:3px\"></i> <em>0人</em></li>\n" +
-                "                        <li><span>差劲</span><i style=\"width:6px\"></i> <em>0人</em></li>\n" +
+                "            <div id=\"book_info\">\n" +
+                "                <div style=\"width: 100%\">\n" +
+                "                    <ul id=\"book_detail\">\n" +
+                "                        <li class=\"author\">作者：<a href=\"/author/124141/\">长街纵马</a></li>\n" +
+                "                        <li class=\"sort\">类别：玄幻奇幻</li>\n" +
+                "                        <li class=\"\">状态：连载</li>\n" +
+                "                        <li class=\"\">更新：2021-03-30T22:39:32</li>\n" +
+                "                        <li class=\"\">点击：16</li>\n" +
                 "                    </ul>\n" +
                 "                </div>\n" +
-                "                <div class=\"score_post\">\n" +
-                "                    <div id=\"starBox\">\n" +
-                "                        <div class=\"star_title\">给喜欢的小说评分：</div>\n" +
-                "                        <ul class=\"starlist\" id=\"starlist\">\n" +
-                "                            <li i=\"1\"><a href=\"javascript:void(0);\" title=\"1星\" class=\"star_one\">1</a></li>\n" +
-                "                            <li i=\"2\"><a href=\"javascript:void(0);\" title=\"2星\" class=\"star_two\">2</a></li>\n" +
-                "                            <li i=\"3\"><a href=\"javascript:void(0);\" title=\"3星\" class=\"star_three\">3</a></li>\n" +
-                "                            <li i=\"4\"><a href=\"javascript:void(0);\" title=\"4星\" class=\"star_four\">4</a></li>\n" +
-                "                            <li i=\"5\"><a href=\"javascript:void(0);\" title=\"5星\" class=\"star_five\">5</a></li>\n" +
-                "                        </ul>\n" +
-                "                    </div>\n" +
-                "                    <div class=\"star_tip\" id=\"star_tip\" style=\"display: none;\">\n" +
-                "                        <s id=\"star_tip_arrow\"><i></i></s>\n" +
-                "                        <div id=\"star_desc\" class=\"star_desc\"></div>\n" +
-                "                    </div>\n" +
-                "                </div>\n" +
                 "            </div>\n" +
                 "        </div>\n" +
-                "    </div>\n" +
-                "    \n" +
-                "    <div id=\"sidebar\">\n" +
-                "        <div id=\"fmimg\">\n" +
-                "            <img alt=\"从亡国公主到第一高手\" src=\"/files/article/image/123/123195/123195s.jpg\" onerror=\"this.src='/static/images/nocov.jpg';this.onerror=null;\" width=\"120\" height=\"150\">\n" +
-                "            <span class=\"b\"></span>\n" +
-                "        </div>\n" +
-                "    </div>\n" +
-                "    <div id=\"listtj\">\n" +
-                "        &nbsp;推荐阅读：\n" +
-                "                <a href=\"/1_1694/\">终极斗罗</a>、\n" +
-                "                <a href=\"/0_94/\">校花的贴身高手</a>、\n" +
-                "                <a href=\"/52_52767/\">斗罗大陆4终极斗罗</a>、\n" +
-                "                <a href=\"/0_69/\">最强狂兵</a>、\n" +
-                "                <a href=\"/0_274/\">全职法师</a>、\n" +
-                "                <a href=\"/75_75386/\">妖孽奶爸在都市</a>、\n" +
-                "            </div>\n" +
+                "    </div>      \n" +
+                "    <p class=\"btn\">\n" +
+                "        <a href=\"/124_124141/all.html\">章节列表</a>\n" +
+                "        <a href=\"javascript:addBookCase(124141);\" class=\"btn_toBookShelf\">加入书架</a>\n" +
+                "        <a href=\"/bookcase.html\" class=\"btn_toMyBook\">我的书架</a>\n" +
+                "    </p>\n" +
+                "    <p class=\"review\">\n" +
+                "        &nbsp;&nbsp;&nbsp;&nbsp;前方收费站，减速慢行，请交费！此路是我开，此树是我栽，要想过此路，留下买路财！<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;开局一座收费站，灵石法宝美女，统统给我留下来！我，万界秩序制定者，就这么横！    </p>\n" +
                 "</div>\n" +
                 "\n" +
-                "<script type=\"text/javascript\">var bookId = 123195;</script>\n" +
-                "<script type=\"text/javascript\">\n" +
-                "xiaoshuo_score.pvid={id:bookId};\n" +
-                "xiaoshuo_score.getS();\n" +
-                "xiaoshuo_score.initStar();\n" +
-                "<!-- showCount(); -->\n" +
-                "</script>\n" +
+                "<script>info1()</script>\n" +
+                "<div class=\"recommend\">\n" +
+                "    <h2>最新章节&nbsp;&nbsp;&nbsp;&nbsp;</h2>\n" +
+                "    <div id=\"chapterlist\" class=\"directoryArea\">\n" +
+                "                <p><a href=\"/124_124141/49157098.html\">第五十六章 愿做保洁的风家</a></p>\n" +
+                "                <p><a href=\"/124_124141/49128569.html\">第五十五章 隋家合作</a></p>\n" +
+                "                <p><a href=\"/124_124141/49107087.html\">第五十四章陈向南还是有能力的</a></p>\n" +
+                "                <p><a href=\"/124_124141/49094649.html\">第五十三章 咬牙交罚款</a></p>\n" +
+                "                <p><a href=\"/124_124141/49081049.html\">第五十二章 炮轰</a></p>\n" +
+                "                <p><a href=\"/124_124141/49065670.html\">第五十一章 隋家来人</a></p>\n" +
+                "                <p><a href=\"/124_124141/49047961.html\">第五十章 终于开张了</a></p>\n" +
+                "                <p><a href=\"/124_124141/49030101.html\">第四十九章 豆芽菜不好找</a></p>\n" +
+                "                <p><a href=\"/124_124141/49019314.html\">第四十八章 是洞天福地还是魔土</a></p>\n" +
+                "                <p><a href=\"/124_124141/49018114.html\">第四十七章 咱也有车了</a></p>\n" +
+                "                <p><a href=\"/124_124141/49006118.html\">第四十六章 价值上亿</a></p>\n" +
+                "                <p><a href=\"/124_124141/49005151.html\">第四十五章 红枪隋东</a></p>\n" +
+                "            </div>\n" +
+                "    <h2><a href=\"/124_124141/all.html\">查看完整目录</a></h2>\n" +
+                "</div>\n" +
                 "\n" +
                 "<script>\n" +
                 "(function(){\n" +
@@ -558,102 +479,22 @@ public class CrawlParser {
                 "});\n" +
                 "</script>\n" +
                 "\n" +
-                "<div class=\"box_con\">\n" +
-                "    <div id=\"list\">\n" +
-                "        <dl>\n" +
-                "            <dt>《从亡国公主到第一高手》最新章节（提示：已启用缓存技术，最新章节可能会延时显示，登录书架即可实时查看。）</dt>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48686574.html\">第24章 旧伤</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661644.html\">第23章 梅轻寒</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661643.html\">第22章 睡不醒的大师兄</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661642.html\">第21章 谷安平</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661641.html\">第20章 心中之敌</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661640.html\">第19章 有口难言</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661639.html\">第18章 盟主之争</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661638.html\">第17章 另有要事</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661637.html\">第16章 幽幻宫文灵韵</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661636.html\">第15章 幽幻宫宫主</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661635.html\">第14章 武林大会</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661634.html\">第13章 偶像之争</a></dd>\n" +
-                "                        \n" +
-                "            <dt>《从亡国公主到第一高手》正文</dt>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661622.html\">第1章 亡国公主</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661623.html\">第2章 邪月剑</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661624.html\">第3章 心如铁石</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661625.html\">第4章 前世回忆</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661626.html\">第5章 赤鹰司</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661627.html\">第6章 庆阳城</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661628.html\">第7章 被迫假死</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661629.html\">第8章 替嫁往事</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661630.html\">第9章 金凤堂</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661631.html\">第10章 邪月剑的邪</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661632.html\">第11章 少女情思</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661633.html\">第12章 大众偶像镇北王</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661634.html\">第13章 偶像之争</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661635.html\">第14章 武林大会</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661636.html\">第15章 幽幻宫宫主</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661637.html\">第16章 幽幻宫文灵韵</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661638.html\">第17章 另有要事</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661639.html\">第18章 盟主之争</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661640.html\">第19章 有口难言</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661641.html\">第20章 心中之敌</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661642.html\">第21章 谷安平</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661643.html\">第22章 睡不醒的大师兄</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48661644.html\">第23章 梅轻寒</a></dd>\n" +
-                "                        <dd> <a style=\"\" href=\"/123_123195/48686574.html\">第24章 旧伤</a></dd>\n" +
-                "                        \n" +
-                "        </dl>\n" +
-                "    </div>\n" +
-                "    \n" +
-                "</div>\n" +
                 "\n" +
-                "</div>\n" +
-                "\n" +
-                "</div>\n" +
-                "\n" +
-                "\n" +
-                "<div id=\"footer\" class=\"footer\">\n" +
-                "    <div class=\"footer_link\">\n" +
-                "        &nbsp;新书推荐：\n" +
-                "                <a href=\"/123_123260/\">一品妖妃：病娇王爷你别跑</a>、\n" +
-                "                <a href=\"/123_123221/\">儒灭万道</a>、\n" +
-                "                <a href=\"/123_123163/\">魔教开局签到魔刀千刃</a>、\n" +
-                "                <a href=\"/123_123267/\">斩妖除魔就变强</a>、\n" +
-                "                <a href=\"/123_123235/\">洪荒：抢我悟道茶，还想传道</a>、\n" +
-                "                <a href=\"/123_123176/\">这灵气复苏有毒</a>、\n" +
-                "                <a href=\"/123_123179/\">白蛇：菩提劫</a>、\n" +
-                "                <a href=\"/123_123172/\">全球降临异界：神级分解师</a>、\n" +
-                "                <a href=\"/123_123200/\">我真的是道帝</a>、\n" +
-                "                <a href=\"/123_123238/\">天医神凰</a>、\n" +
-                "                <a href=\"/123_123192/\">我能无限就职</a>、\n" +
-                "                <a href=\"/123_123241/\">玄幻之末代皇子签到两百年</a>、\n" +
-                "                <a href=\"/123_123173/\">原始救世</a>、\n" +
-                "                <a href=\"/123_123185/\">神赐恶念</a>、\n" +
-                "                <a href=\"/123_123254/\">师父我是认真的</a>、\n" +
-                "                <a href=\"/123_123253/\">无暇天书</a>、\n" +
-                "                <a href=\"/123_123214/\">在修真界不要惹事生非</a>、\n" +
-                "                <a href=\"/123_123216/\">天道残卷之离殇</a>、\n" +
-                "                <a href=\"/123_123249/\">永恒星碑</a>、\n" +
-                "                <a href=\"/123_123168/\">一世孤尊</a>、\n" +
-                "                <a href=\"/123_123195/\">从亡国公主到第一高手</a>、\n" +
-                "                <a href=\"/123_123226/\">学霸大佬重返八零</a>、\n" +
-                "                <a href=\"/123_123246/\">团宠小妖精的马甲要爆了</a>、\n" +
-                "                <a href=\"/123_123257/\">我的房东是龙王</a>、\n" +
-                "                <a href=\"/123_123160/\">开局签到破宗门，还以为自己废了</a>、\n" +
-                "                <a href=\"/123_123258/\">随身携带技能抽奖系统</a>、\n" +
-                "                <a href=\"/123_123198/\">透明影后你又又又挂热搜了</a>、\n" +
-                "                <a href=\"/123_123205/\">孤行九州</a>、\n" +
-                "                <a href=\"/123_123265/\">祸国狂后：妖孽皇帝别惹我</a>、\n" +
-                "                <a href=\"/123_123175/\">被神都抛弃的底层召唤师</a>、\n" +
-                "            </div>\n" +
-                "    <div class=\"footer_cont\">\n" +
-                "    <p>本站所有小说为转载作品，所有章节均由网友上传，转载至本站只是为了宣传本书让更多读者欣赏。</p>\n" +
-                "    <p>Copyright © 2017 笔趣阁 All Rights Reserved. </p>\n" +
-                "    <script>recordedclick(123195);tj();</script>\n" +
-                "    </div>\n" +
-                "    <p></p>\n" +
-                "    <p>欢迎收藏本站 <a href=\"/api/sitemap.xml\" style=\"color: #FF0000;\" target=\"_blank\">网站地图</a></p>\n" +
-                "</div>\n" +
-                "\n" +
+                "<script>info2()</script>\n" +
+                "<form class=\"searchForm\" method=\"get\" action=\"/SearchBook.php\">\n" +
+                "    <input type=\"text\" name=\"keyword\" class=\"searchForm_input searchForm_input2\" placeholder=\"输入书名或作者\">\n" +
+                "    <input type=\"submit\" class=\"searchForm_btn\" value=\"搜索\">\n" +
+                "</form>\n" +
+                "<footer>\n" +
+                "    <a href=\"#top\"><img src=\"/images/icon-backtop.gif\" title=\"↑\" alt=\"↑\"></a>\n" +
+                "    <p class=\"version channel\">\n" +
+                "        <a href=\"/\">首页</a>\n" +
+                "        <a href=\"/bookcase.html\">我的书架</a>\n" +
+                "        <a href=\"/gj.html\">阅读记录</a>\n" +
+                "        <a href=\"/api/sitemap.xml\">sitemap</a>\n" +
+                "    </p>\n" +
+                "</footer>\n" +
+                "<script>recordedclick(124141);tj();</script>\n" +
                 "\n" +
                 "</body>\n" +
                 "</html>" );

@@ -74,12 +74,11 @@ public class BookServiceImpl implements BookService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveBookAndIndexAndContent(Book book, List<BookIndex> bookIndexList, List<BookContent> bookContentList) {
+
+        System.out.println("开始保存数据=========");
         if(!queryIsExistByBookNameAndAuthorName(book.getBookName(),book.getAuthorName())) {
-
             if(bookIndexList.size()>0) {
-
                 //保存小说主表
-
                 book.setCreateTime(new Date());
                 bookMapper.insertSelective(book);
 

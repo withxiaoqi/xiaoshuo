@@ -122,14 +122,11 @@ public class CrawlServiceImpl implements CrawlService {
                 for (int i = 1; i < 8; i++) {
                     final int catId = i;
                     Thread thread = new Thread(() -> {
-
                         parseBookList(catId, ruleBean, sourceId);
-
                     });
                     thread.start();
                     //thread加入到监控缓存中
                     threadIds.add(thread.getId());
-
                 }
                 cacheService.setObject(CacheKey.RUNNING_CRAWL_THREAD_KEY_PREFIX + sourceId, threadIds);
 
@@ -189,6 +186,7 @@ public class CrawlServiceImpl implements CrawlService {
          List<CrawlSingleTask> list = crawlSingleTaskMapper.selectMany(select(CrawlSingleTaskDynamicSqlSupport.crawlSingleTask.allColumns())
                 .from(CrawlSingleTaskDynamicSqlSupport.crawlSingleTask)
                 .where(CrawlSingleTaskDynamicSqlSupport.taskStatus,isEqualTo((byte)2))
+                 .and(CrawlSingleTaskDynamicSqlSupport.excCount,isEqualTo((byte)0))
                  .orderBy(CrawlSingleTaskDynamicSqlSupport.createTime)
                  .limit(1)
                 .build()
@@ -221,9 +219,7 @@ public class CrawlServiceImpl implements CrawlService {
         int totalPage = page;
 
         while (page <= totalPage) {
-
             try {
-
                 if(StringUtils.isNotBlank(ruleBean.getCatIdRule().get("catId" + catId))) {
                     //拼接分类URL
                     String catBookListUrl = ruleBean.getBookListUrl()
@@ -244,15 +240,11 @@ public class CrawlServiceImpl implements CrawlService {
                                 if(Thread.currentThread().isInterrupted()){
                                     return;
                                 }
-
-
                                 String bookId = bookIdMatcher.group(1);
                                 parseBookAndSave(catId, ruleBean, sourceId, bookId);
                             } catch (Exception e) {
                                 log.error(e.getMessage(), e);
                             }
-
-
                             isFindBookId = bookIdMatcher.find();
                         }
 
@@ -260,12 +252,11 @@ public class CrawlServiceImpl implements CrawlService {
                         Matcher totalPageMatcher = totalPagePatten.matcher(bookListHtml);
                         boolean isFindTotalPage = totalPageMatcher.find();
                         if (isFindTotalPage) {
-
                             totalPage = Integer.parseInt(totalPageMatcher.group(1));
-
+                            System.out.println("分类总页数"+totalPage);
+                            //暂时只采集一页
+                            //totalPage = 1;
                         }
-
-
                     }
                 }
             }catch (Exception e){

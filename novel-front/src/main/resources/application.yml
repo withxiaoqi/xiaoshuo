@@ -1,18 +1,18 @@
 server:
-  port: 8080
+  port: 18082
 
 spring:
   profiles:
-    active: dev
+    active: prod
     include: website,alipay,oss,fastdfs
 
 
   rabbitmq:
     enable: 0
-    host: 127.0.0.1
-    username: guest
-    password: guest
-    virtual-host: /novel-plus
+    host: 8.130.165.227
+    username: shuba
+    password: shuba
+    virtual-host: shuba
     template:
       # 缺省的交换机名称，此处配置后，发送消息如果不指定交换机就会使用这个
       exchange: novel.exchange

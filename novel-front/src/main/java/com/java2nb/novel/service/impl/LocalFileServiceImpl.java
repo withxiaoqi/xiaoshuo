@@ -18,6 +18,8 @@ public class LocalFileServiceImpl implements FileService {
     @Override
     public String transFile(String picSrc, String picSavePath){
 
+        System.out.println("地址："+picSrc);
+        System.out.println("路径："+picSavePath);
         return FileUtil.network2Local(picSrc, picSavePath, Constants.LOCAL_PIC_PREFIX);
     }
 }

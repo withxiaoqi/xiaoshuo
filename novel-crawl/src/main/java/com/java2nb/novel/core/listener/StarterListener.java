@@ -94,20 +94,15 @@ public class StarterListener implements ServletContextListener {
                 try {
                     //获取采集任务
                     task = crawlService.getCrawlSingleTask();
-
                     if (task != null) {
                         //查询爬虫规则
                         CrawlSource source = crawlService.queryCrawlSource(task.getSourceId());
                         RuleBean ruleBean = new ObjectMapper().readValue(source.getCrawlRule(), RuleBean.class);
-
-
                         if (crawlService.parseBookAndSave(task.getCatId(), ruleBean, task.getSourceId(), task.getSourceBookId())) {
                             //采集成功
                             crawlStatus = 1;
                         }
-
                     }
-
                     Thread.sleep(1000 * 60);
 
                 } catch (Exception e) {
